@@ -1,0 +1,206 @@
+using System;
+using System.Collections.Generic;
+
+class Vehicle
+{
+    public string Brand { get; set; }
+    public string Model { get; set; }
+    public int Year { get; set; }
+
+    public Vehicle(string brand, string model, int year)
+    {
+        Brand = brand;
+        Model = model;
+        Year = year;
+    }
+
+    public virtual void StartEngine()
+    {
+        Console.WriteLine($"{Brand} {Model} двигатель запущен.");
+    }
+    public virtual void StopEngine()
+    {
+        Console.WriteLine($"{Brand} {Model} двигатель остановлен.");
+    }
+
+    public virtual void DisplayInfo()
+    {
+        Console.WriteLine($"Марка: {Brand}, Модель: {Model}, Год выпуска: {Year}");
+    }
+}
+
+
+class Car : Vehicle
+{
+    public int NumberOfDoors { get; set; }
+    public string TransmissionType { get; set; }
+
+    public Car(string brand, string model, int year, int numberOfDoors, string transmissionType)
+        : base(brand, model, year)
+    {
+        NumberOfDoors = numberOfDoors;
+        TransmissionType = transmissionType;
+    }
+
+    public override void DisplayInfo()
+    {
+        base.DisplayInfo();
+        Console.WriteLine($"Количество дверей: {NumberOfDoors}, Тип трансмиссии: {TransmissionType}");
+    }
+}
+
+
+class Motorcycle : Vehicle
+{
+    public string BodyType { get; set; }
+    public bool HasSideBox { get; set; }
+
+    public Motorcycle(string brand, string model, int year, string bodyType, bool hasSideBox)
+        : base(brand, model, year)
+    {
+        BodyType = bodyType;
+        HasSideBox = hasSideBox;
+    }
+
+    public override void DisplayInfo()
+    {
+        base.DisplayInfo();
+        Console.WriteLine($"Тип кузова: {BodyType}, Наличие бокса: {(HasSideBox ? "Есть" : "Нет")}");
+    }
+}
+
+
+class Garage
+{
+    public string GarageName { get; set; }
+    public List<Vehicle> Vehicles { get; private set; }
+
+    public Garage(string garageName)
+    {
+        GarageName = garageName;
+        Vehicles = new List<Vehicle>();
+    }
+
+    // Метод для добавления
+    public void AddVehicle(Vehicle vehicle)
+    {
+        Vehicles.Add(vehicle);
+        Console.WriteLine($"Транспортное средство {vehicle.Brand} {vehicle.Model} добавлено в гараж {GarageName}.");
+    }
+
+    // Метод для удаления
+    public void RemoveVehicle(Vehicle vehicle)
+    {
+        if (Vehicles.Remove(vehicle))
+        {
+            Console.WriteLine($"Транспортное средство {vehicle.Brand} {vehicle.Model} удалено из гаража {GarageName}.");
+        }
+        else
+        {
+            Console.WriteLine($"Транспортное средство не найдено в гараже {GarageName}.");
+        }
+    }
+
+    // Метод для отображения
+    public void DisplayVehicles()
+    {
+        Console.WriteLine($"Гараж: {GarageName}");
+        foreach (var vehicle in Vehicles)
+        {
+            vehicle.DisplayInfo();
+            Console.WriteLine();
+        }
+    }
+}
+
+
+class Fleet
+{
+    public List<Garage> Garages { get; private set; }
+
+    public Fleet()
+    {
+        Garages = new List<Garage>();
+    }
+
+    // Метод для добавления гаража в автопарк
+    public void AddGarage(Garage garage)
+    {
+        Garages.Add(garage);
+        Console.WriteLine($"Гараж {garage.GarageName} добавлен в автопарк.");
+    }
+
+    // Метод для удаления гаража
+    public void RemoveGarage(Garage garage)
+    {
+        if (Garages.Remove(garage))
+        {
+            Console.WriteLine($"Гараж {garage.GarageName} удален из автопарка.");
+        }
+        else
+        {
+            Console.WriteLine($"Гараж не найден.");
+        }
+    }
+
+    // Метод для поиска ТС
+    public Vehicle FindVehicle(string brand, string model)
+    {
+        foreach (var garage in Garages)
+        {
+            foreach (var vehicle in garage.Vehicles)
+            {
+                if (vehicle.Brand == brand && vehicle.Model == model)
+                {
+                    Console.WriteLine($"Найдено транспортное средство {brand} {model} в гараже {garage.GarageName}.");
+                    return vehicle;
+                }
+            }
+        }
+        Console.WriteLine($"Транспортное средство {brand} {model} не найдено.");
+        return null;
+    }
+}
+
+
+// Test Program (Main)
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем ТС
+        Car car1 = new Car("Mercedes-Benz", "C-class", 2015, 4, "MT");
+        Car car2 = new Car("Jaguar", "F-type", 2020, 4, "AT");
+        Motorcycle moto1 = new Motorcycle("CF-Moto", "BM-1000", 2019, "Sportbike", false);
+        Motorcycle moto2 = new Motorcycle("Yamaha", "R-1", 2010, "Sportbike", false);
+
+        // Создаем гаражи
+        Garage garage1 = new Garage("Гараж 1");
+        Garage garage2 = new Garage("Гараж 2");
+
+        // Добавляем ТС
+        garage1.AddVehicle(car1);
+        garage1.AddVehicle(moto1);
+        garage2.AddVehicle(car2);
+        garage2.AddVehicle(moto2);
+
+        // Создаем автопарк и добавляем гаражи
+        Fleet fleet = new Fleet();
+        fleet.AddGarage(garage1);
+        fleet.AddGarage(garage2);
+
+        // Отображаем содержимое каждого гаража
+        garage1.DisplayVehicles();
+        garage2.DisplayVehicles();
+
+        // Поиск ТС
+        fleet.FindVehicle("Honda", "Civic");
+
+        // Удаление ТС
+        garage1.RemoveVehicle(moto1);
+
+        // Удаление гаража
+        fleet.RemoveGarage(garage1);
+    }
+}
+
